@@ -1,0 +1,41 @@
+TINDER
+------------------------------------
+tinder.com/@#USERNAME#
+After opening the user profile, view the source code of the page and search for the following;
+birth_date
+_id
+You'll see the birthdate of the user and the user id of the user
+
+you can use google dorks to search out a user
+site:tinder.com "drew"
+
+
+
+REDDIT
+------------------------------------
+To see the profile of a reddit user
+https://www.reddit.com/user/#REDDIT_USERNAME#
+
+To see the moderators of a Subreddit
+https://www.reddit.com/r/#SUBREDDIT#/about/moderators
+
+
+
+
+YOUTUBE
+-----------------------------------
+To get the details about a YouTube video and its uploader, playlist, creator, or channel.
+https://mattw.io/youtube-metadata/
+
+
+
+INSTAGRAM
+-----------------------------------
+To get an instagram profile ID, open their profile and view source code.
+The search for "profilepage_", after this variable, you'll see the variable name and value for "profile_id".
+Or you can use the following websites to search by typing in the username in the srarch box
+https://commentpicker.com/instagram-user-id.php
+https://www.instafollowers.co/find-instagram-user-id
+
+You can also download the highlights on their profile by using the following website
+https://iganony.io/profile

