@@ -1,0 +1,48 @@
+Traditional Fix
+
+- run the following to see the set variables
+	set
+- run the following to see the existing partitions
+	ls
+- now you check the filesystem of the partitions
+	ls #PARTION_NAME#
+		e.g. ls (hd0,gpt4)
+- if you see a message such as "Filesystem is ext2". Then you can proceed with that partition. Be careful though because if you have two linux systems dual-booted then you'll have to verify that it's the right partition. try to see if you can run something like
+	cat (hd0,gpt4)/etc/issue
+- set the boot variable to the partition
+	set boot=(hd0,msdos2)
+- set the prefix variable
+	set prefix=(hd0,msdos6)/boot/grub
+- set the insmod to normal
+	insmod normal
+- run the following command
+	normal
+- the system should boot into the normal grub now. proceed to fix the grub
+	sudo grub-install #FULL_DISK_CONTAINING_PARTITIONS#
+		e.g. sudo grub-install /dev/sda		NOT /dev/sda4
+	sudo update-grub
+	sudo apt update
+	sudo apt upgrade
+	sudo reboot now
+	
+
+If traditional way to fix the Grub rescue doesn't work, then create a live boot (not installation) of kali, then boot into it and do the following
+
+- find the right partition for your kali using 
+	sudo fdisk -l
+- mount the partition using
+	sudo mount /dev/#PARTITION# /mnt
+		If you have a separate /boot, /var or /usr partitions, repeat this step to mount these partitions to /mnt/boot, /mnt/var and /mnt/usr respectively. E.g. sudo mount /dev/#BOOT_PARTITION# /mnt/boot
+- Bind mount some other necessary stuff:
+	for i in /sys /proc /run /dev; do sudo mount --rbind "$i" "/mnt$i"; done
+- If Ubuntu is installed in EFI mode (see this answer if you're unsure), use "sudo fdisk -l | grep -i efi" or GParted to find your EFI partition. It will have a label of EFI. Mount this partition, replacing sdXY with the actual partition number for your system:
+	sudo mount /dev/sdXY /mnt/boot/efi
+- chroot into your mounted install:
+	sudo chroot /mnt
+- Update grub
+	update-grub
+
+- Install grub (this might sometimes be necessary even if the above command doesn't give an error)
+	grub-install /dev/sda ## If it's an NVMe drive, you might need to instead run the following command
+		grub-install --target=x86_64-efi --efi-directory=/boot/efi --bootloader-id=grub --recheck
+	update-grub
