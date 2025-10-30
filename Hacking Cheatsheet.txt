@@ -167,7 +167,7 @@ find / -user root -perm -4000 -exec ls -ldb {} \;
 
 find files that can be run by group for privilege escalation one liner
 
-find / -group <groupname> -type f 2>/dev/null
+find / -xdev -group <groupname> -type f 2>/dev/null    #-xdev avoids other filesystems and things like /proc and /sys
 
 
 Find Both Group-Readable and Group-Writable Files:
