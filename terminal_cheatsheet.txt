@@ -1,0 +1,2 @@
+Search recursively for files under ~ containing "N8N" followed by "PASS" on the next line, suppressing error messages
+pcregrep -M -r 'N8N.*\n.*PASS' ~ 2>/dev/null
