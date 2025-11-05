@@ -306,7 +306,10 @@ enum4linux -a IPADDRESS
 to enumerate users and possibly passwords on machines that have smb open
 
 
-
+SUBDOMAIN ENUMERATION
+waymore -i site.com
+assetfinder site.com
+waybackurls site.com
 
 
 
