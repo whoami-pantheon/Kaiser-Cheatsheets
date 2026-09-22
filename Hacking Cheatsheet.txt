@@ -1435,7 +1435,8 @@ aws iam list-roles --profile ##LOGGEDIN_PROFILE_NAME##
 
 
 
-
+If you already know the name of the role, you can filter like this: the previous from then
+aws iam list-roles --query "Roles[?RoleName=='SupportRole']"
 
 
 
