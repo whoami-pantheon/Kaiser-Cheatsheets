@@ -1436,12 +1436,16 @@ aws iam list-roles --profile ##LOGGEDIN_PROFILE_NAME##
 
 
 If you already know the name of the role, you can filter like this: the previous from then
-aws iam list-roles --query "Roles[?RoleName=='SupportRole']"
+aws iam list-roles --query "Roles[?RoleName=='##ROLE_TO_GREP_FOR##']"
 
 
 
+To list role permissions/policies
+aws iam list-role-policies --role-name ##ROLENAME##
 
 
+To see details if a policy that a role has
+aws iam get-role-policy --role-name ##ROLENAME## --policy-name ##POLICYNAME##
 
 
 
