@@ -1333,6 +1333,69 @@ use "strings" command to extract readablle text of 4 characters or more from fil
 
 
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+AWS COMMANDS
+
+To login to aws on terminal
+aws configure --profile #CHOSEN_PROFILE_NAME#
+
+When launched, there will immediately be a popup to enter AWS Access Key ID, AWS Secret Access Key, Default region name, and Default region name (json is fine for here). 
+
+You can also deliver temporary credentials to the AWS CLI using your AWS Console session by running the command 'aws login'.
+
+
+
+
+The equivalent of the whoami command in linux for aws is below;
+aws sts get-caller-identity --profile #LOGGEDIN_PROFILE_NAME#
+
+
+To get a more detailed output of the logged in user, use the following
+aws iam get-user --profile #LOGGEDIN_PROFILE_NAME#
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 https://gchq.github.io/CyberChef/				#CONTAINS A CRAP-TON OF UTILITIES YOU CAN USE IN EVERYDAY TECH STUFF
 
 
