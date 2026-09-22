@@ -1366,11 +1366,72 @@ You can also deliver temporary credentials to the AWS CLI using your AWS Console
 
 
 The equivalent of the whoami command in linux for aws is below;
-aws sts get-caller-identity --profile #LOGGEDIN_PROFILE_NAME#
+aws sts get-caller-identity --profile ##LOGGEDIN_PROFILE_NAME##
 
 
 To get a more detailed output of the logged in user, use the following
-aws iam get-user --profile #LOGGEDIN_PROFILE_NAME#
+aws iam get-user --profile ##LOGGEDIN_PROFILE_NAME##
+
+
+
+To get a list of users in the environment
+aws iam list-users --profile ##LOGGEDIN_PROFILE_NAME##
+
+
+
+To enumerate group information in the environment
+aws iam list-groups
+
+
+
+To figure out what group in particular a user belongs to.
+aws iam list-groups-for-user --user-name ##USERNAME##
+
+
+To to enumerate a group's information
+aws iam get-group --group-name ##GROUPNAME##
+
+
+To see the policies/permissions that a user has, you can run the below. This command only lists out inline policies, not managed policies.
+aws iam list-user-policies --user-name ##USERNAME## --profile ##LOGGEDIN_PROFILE_NAME##
+
+
+To list attached managed policies.
+aws iam list-attached-user-policies --user-name ##USERNAME## --profile ##LOGGEDIN_PROFILE_NAME##
+
+
+To see the details of a policy that a user has
+aws iam get-user-policy --user-name ##USERNAME## --policy-name ##POLICY_NAME## --profile ##LOGGEDIN_PROFILE_NAME##
+
+
+
+To enumerate a group's permissions.
+aws iam list-group-policies --group-name ##GROUPNAME##
+
+
+To see the details of a policy that a group has
+aws iam get-group-policy --group-name ##GROUPNAME## --policy-name ##POLICY_NAME##
+
+
+
+To list attached managed policies for groups.
+aws iam list-attached-group-policies --group-name ##USERNAME## --profile ##LOGGEDIN_PROFILE_NAME##
+
+
+
+To see how many access keys exist for your user. You can also pass the --user-name flag to see other users
+aws iam list-access-keys --profile ##LOGGEDIN_PROFILE_NAME##
+
+
+
+To get a snapshot of the configuration of IAM permissions (users, groups, roles, and policies) and their relationships in the account.
+aws iam get-account-authorization-details --profile ##LOGGEDIN_PROFILE_NAME##
+
+
+
+To enumerate information about roles
+aws iam list-roles --profile ##LOGGEDIN_PROFILE_NAME##
+
 
 
 
